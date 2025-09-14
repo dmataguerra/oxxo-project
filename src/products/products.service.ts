@@ -12,10 +12,12 @@ export class ProductsService {
     
   } 
 
-  create(createProductDto: CreateProductDto) {
-    const product = this.productRepository.create(createProductDto);
-    const savedProduct = this.productRepository.save(product);
-    return savedProduct;
+  async create(createProductDto: CreateProductDto) {
+    const product = this.productRepository.create({
+      ...createProductDto,
+      provider: createProductDto.providerId ? { providerId: createProductDto.providerId } as any : undefined,
+    });
+    return await this.productRepository.save(product);
   }
 
   findAll() {
@@ -28,11 +30,9 @@ export class ProductsService {
     return product;
   }
 
-  // findByProvider(id: string) {
-  //   const productsFound = this.products.filter((product) => product.provider === id);
-  //   if(productsFound.length === 0) throw new NotFoundException('Products not found for the given provider');
-  //   return productsFound;
-  // }
+   findByProvider(id: string) {
+    return "Ok"; 
+   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     const product = await this.findOne(id);
