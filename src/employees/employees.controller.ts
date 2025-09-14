@@ -19,7 +19,7 @@ export class EmployeesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.employeesService.findOne(+id);
+    return this.employeesService.findOne(+id); //el + convierte el string a number like : parseInt(id)
   }
 
   @Patch(':id')

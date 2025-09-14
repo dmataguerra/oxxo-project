@@ -1,26 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { last } from 'rxjs';
 
 @Injectable()
 export class EmployeesService {
+  private employees: CreateEmployeeDto[]= [
+    {
+    id: 1,
+    name: 'John Doe',
+    lastName: 'Smith',
+    phoneNumber: '123-456-7890'
+  },
+  {
+    id: 2,
+    name: 'Jane',
+    lastName: 'Doe',
+    phoneNumber: '987-654-3210'
+  }]
   create(createEmployeeDto: CreateEmployeeDto) {
-    return 'This action adds a new employee';
+    createEmployeeDto.id = this.employees.length + 1;
+   this.employees.push(createEmployeeDto);
+   return this.employees; 
   }
 
   findAll() {
-    return `This action returns all employees`;
+    //Retorne todos los empleados
+    return this.employees;
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} employee`;
+    const employee = this.employees.filter((employee)=> employee.id === id);
+    return employee;
   }
 
   update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
-    return `This action updates a #${id} employee`;
+    const employee = this.employees.find((employee) => employee.id === id);
+    if (!employee) {
+      return null;
+    }
+    Object.assign(employee, updateEmployeeDto);
+    return employee;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} employee`;
+    this.employees =  this.employees.filter((employee) => employee.id !== id);
+    return this.employees;
   }
 }
