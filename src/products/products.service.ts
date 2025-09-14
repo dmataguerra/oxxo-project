@@ -22,6 +22,7 @@ export class ProductsService {
     }
   ];
   create(createProductDto: CreateProductDto) {
+    if(!createProductDto.productId) createProductDto.productId = uuid();
     createProductDto.productId = uuid();
     this.products.push(createProductDto);
     return createProductDto;
@@ -32,8 +33,8 @@ export class ProductsService {
   }
 
   findOne(id: string) {
-    const productFound = this.products.filter((product)=>product.productId === id);
-    if(!productFound) throw  new NotFoundException ("Product not found");
+    const productFound = this.products.find((product) => product.productId === id);
+    if (!productFound) throw new NotFoundException('Product not found');
     return productFound;
   }
 
@@ -44,10 +45,9 @@ export class ProductsService {
   }
 
   update(id: string, updateProductDto: UpdateProductDto) {
-    let product = this.findOne(id);
-    product = {...product, ...updateProductDto};
+    const product = this.findOne(id);
+    Object.assign(product, updateProductDto);
     return product;
-
   }
 
   remove(id: string) {
