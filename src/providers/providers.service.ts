@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProviderDto } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,25 +10,42 @@ import { Provider } from './entities/provider.entity';
 export class ProvidersService {
   constructor(
     @InjectRepository(Provider)
-    private providerRepositoruy: Repository<Provider>,
+    private providerRepository: Repository<Provider>,
   ){}
   create(createProviderDto: CreateProviderDto) {
-    return this.providerRepositoruy.save(createProviderDto);
+    return this.providerRepository.save(createProviderDto);
   }
 
   findAll() {
-    return `This action returns all providers`;
+    return this.providerRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} provider`;
+  findOne(id: string) {
+    return this.providerRepository.findOneBy({
+      providerId: id
+    })
   }
 
-  update(id: number, updateProviderDto: UpdateProviderDto) {
-    return `This action updates a #${id} provider`;
+  async update(id: string, updateProviderDto: UpdateProviderDto) {
+    const provider = await this.providerRepository.preload({
+      providerId: id,
+      ...updateProviderDto
+    });
+    if (!provider) {
+      throw new NotFoundException('Provider not found');
+    }
+    return this.providerRepository.save(provider);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} provider`;
+  findByName(name : string){
+    return this.providerRepository.findBy({
+      providerName: name
+    })
+  }
+
+  remove(id: string) {
+    this.providerRepository.delete({
+       providerId: id 
+    })
   }
 }

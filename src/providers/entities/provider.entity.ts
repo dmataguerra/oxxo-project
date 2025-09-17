@@ -14,6 +14,6 @@ export class Provider {
         nullable: true,
     })
     providerPhoneNumber: string;
-    @OneToMany(() => Product, (product) => product.provider, { eager: true })
+    @OneToMany(() => Product, (product) => product.provider)
     products: Product[];
 }

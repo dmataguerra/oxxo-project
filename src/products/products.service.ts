@@ -21,18 +21,28 @@ export class ProductsService {
   }
 
   findAll() {
-    return this.productRepository.find();
+    return this.productRepository.find({ relations: ['provider'] });
   }
 
   async findOne(id: string) {
-    const product = await this.productRepository.findOne({ where: { productId: id } });
+    const product = await this.productRepository.findOne({
+      where: { productId: id },
+      relations: ['provider']
+    });
     if (!product) throw new NotFoundException('Product not found');
     return product;
   }
 
-   findByProvider(id: string) {
-    return "Ok"; 
-   }
+  async findByProvider(id: string) {
+    return this.productRepository.find({
+      where: {
+        provider: {
+          providerId: id,
+        }
+      },
+      relations: ['provider']
+    });
+  }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     const product = await this.findOne(id);
