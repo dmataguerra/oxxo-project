@@ -4,7 +4,7 @@ import { UpdateProviderDto } from './dto/update-provider.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Provider } from './entities/provider.entity';
-
+import { Like } from 'typeorm';
 
 @Injectable()
 export class ProvidersService {
@@ -38,9 +38,13 @@ export class ProvidersService {
   }
 
   findByName(name : string){
-    return this.providerRepository.findBy({
-      providerName: name
+    const provider = this.providerRepository.findBy({
+      providerName: Like(`%${name}%`)
     })
+    if(!provider) {
+        throw new NotFoundException('Provider not found');
+    }
+    return provider;
   }
 
   remove(id: string) {
