@@ -21,27 +21,21 @@ export class ProductsService {
   }
 
   findAll() {
-    return this.productRepository.find({ relations: ['provider'] });
+    return this.productRepository.find();
   }
 
   async findOne(id: string) {
-    const product = await this.productRepository.findOne({
-      where: { productId: id },
-      relations: ['provider']
-    });
+    const product = await this.productRepository.findOne({ where: { productId: id } });
     if (!product) throw new NotFoundException('Product not found');
     return product;
   }
 
-  async findByProvider(id: string) {
-    return this.productRepository.find({
-      where: {
+   findByProvider(id: string) {
+      return this.productRepository.findBy({
         provider: {
           providerId: id,
         }
-      },
-      relations: ['provider']
-    });
+      })
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {

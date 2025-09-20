@@ -12,6 +12,8 @@ export class ProvidersService {
     @InjectRepository(Provider)
     private providerRepository: Repository<Provider>,
   ){}
+
+
   create(createProviderDto: CreateProviderDto) {
     return this.providerRepository.save(createProviderDto);
   }
@@ -25,7 +27,7 @@ export class ProvidersService {
       providerId: id
     })
   }
-
+  
   async update(id: string, updateProviderDto: UpdateProviderDto) {
     const provider = await this.providerRepository.preload({
       providerId: id,
