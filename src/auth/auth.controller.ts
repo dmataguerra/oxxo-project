@@ -7,8 +7,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post('signup')
   signup(@Body () createUserDto : CreateUserDto) {
     return this.authService.registerUser(createUserDto);
+  }
+
+  @Post('login')
+  login(@Body() createUserDto: CreateUserDto) {
+    return this.authService.loginUser(createUserDto);
   }
 }
