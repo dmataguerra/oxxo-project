@@ -11,9 +11,9 @@ export class Location {
     locationName: string;
     @Column('text')
     locationAddress: string;
-    @Column('integer', { array: true })
+    @Column('float', { array: true })
     locationLating: number[];
-    @OneToOne(() => Manager)
+    @OneToOne(() => Manager, {eager : true})
     @JoinColumn({
         name : "managerId"
     })

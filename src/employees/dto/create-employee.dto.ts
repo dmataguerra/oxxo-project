@@ -1,6 +1,6 @@
-import {IsEmail, IsString, MaxLength } from "class-validator";
+import {IsEmail, IsObject, IsString, MaxLength, IsOptional } from "class-validator";
 
-export class CreateEmployeeDto {
+export class CreateEmployeeDto{ 
     @IsString()
     @MaxLength(40)
     employeeName: string;
@@ -13,4 +13,7 @@ export class CreateEmployeeDto {
     @IsString()
     @IsEmail()
     employeeEmail: string;
+    @IsOptional()
+    @IsObject()
+    location : object;
 }

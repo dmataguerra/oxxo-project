@@ -13,8 +13,12 @@ export class ManagersService {
     private managerRepository: Repository<Manager>
   )
   {}
-  create(createManagerDto: CreateManagerDto) {
-    return this.managerRepository.save(createManagerDto);
+  async create(createManagerDto: CreateManagerDto) {
+    const manager = this.managerRepository.create({
+      ...createManagerDto,
+      user: createManagerDto.userId ? { userId: createManagerDto.userId } as any : undefined,
+    });
+    return this.managerRepository.save(manager);
   }
 
   findAll() {
@@ -28,11 +32,13 @@ export class ManagersService {
   }
 
   async update(id: string, updateManagerDto: UpdateManagerDto) {
+    const { userId, ...managerData } = updateManagerDto;
     const managerToUpdate = await this.managerRepository.preload({
       managerId: id,
-      ...updateManagerDto
-    })
-    if(!managerToUpdate) throw new NotFoundException("Manager not found")
+      ...managerData,
+      user: userId ? { userId } as any : undefined,
+    });
+    if(!managerToUpdate) throw new NotFoundException("Manager not found");
     return this.managerRepository.save(managerToUpdate);
   }
 
