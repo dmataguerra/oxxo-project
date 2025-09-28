@@ -12,6 +12,7 @@ export class Provider {
     @Column({
         type: 'text',
         nullable: true,
+        unique: true
     })
     providerPhoneNumber: string;
     @OneToMany(() => Product, (product) => product.provider)

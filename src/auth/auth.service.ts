@@ -44,4 +44,17 @@ export class AuthService {
   async findUserById(userId: string): Promise<User | null> {
     return this.userRepository.findOne({ where: { userId } });
   }
+
+  async updateUser(userEmail: string, updateUserDto: UpdateUserDto) {
+    const newUserData = await this.userRepository.preload({
+      userEmail,
+      ...updateUserDto
+    });
+    
+    if (!newUserData) {
+      throw new NotFoundException('User not found');
+    }
+    
+    return await this.userRepository.save(newUserData);
+  }
 }
