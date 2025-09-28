@@ -4,7 +4,10 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import {ROLES} from 'src/auth/constants/roles.constants';
 import { Auth } from 'src/auth/decorators/auth.decorators';
+import { ApiResponse, ApiTags, ApiProperty } from '@nestjs/swagger';
+import { ApiAuth } from 'src/auth/decorators/api.decorators';
 
+@ApiAuth()
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}

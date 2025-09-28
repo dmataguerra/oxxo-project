@@ -10,7 +10,10 @@ import { Roles } from 'src/auth/decorators/roles.decorators';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Auth } from 'src/auth/decorators/auth.decorators';
 import {ROLES} from 'src/auth/constants/roles.constants';
+import { ApiResponse, ApiTags, ApiProperty } from '@nestjs/swagger';
+import { ApiAuth } from 'src/auth/decorators/api.decorators';
 
+@ApiAuth()
 @Controller('providers')
 export class ProvidersController {
   constructor(private readonly providersService: ProvidersService) {}
