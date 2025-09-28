@@ -32,8 +32,16 @@ export class AuthService {
       return { message : "Invalid credentials" }
     }
 
-    const token = this.jwtService.sign({ userId : user.userId, userEmail : user.userEmail});
+    const token = this.jwtService.sign({ 
+      userId: user.userId, 
+      userEmail: user.userEmail, 
+      userRoles: user.userRoles 
+    });
     return { token }; 
     //return { message : "Login successful" }
+  }
+
+  async findUserById(userId: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { userId } });
   }
 }
