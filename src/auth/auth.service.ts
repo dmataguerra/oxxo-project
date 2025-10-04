@@ -45,14 +45,6 @@ export class AuthService {
     return this.userRepository.findOne({ where: { userId } });
   }
 
-  async findAllUsers(): Promise<User[]> {
-    return this.userRepository.find();
-  }
-
-  async findUserByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { userEmail: email } });
-  }
-
   async updateUser(userEmail: string, updateUserDto: UpdateUserDto) {
     const newUserData = await this.userRepository.preload({
       userEmail,
