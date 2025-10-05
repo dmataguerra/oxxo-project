@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ApiResponse, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { ApiAuth } from 'src/auth/decorators/api.decorators';
+import type { Response } from 'express';
+import {TOKEN_NAME} from './constants/jwt.constants';
+import {Cookies} from './decorators/cookies.decorators';
 
 @ApiTags('Authentication')
 @ApiAuth()
@@ -47,8 +50,10 @@ export class AuthController {
     description: 'Unauthorized - Invalid credentials' 
   })
   @Post('login')
-  login(@Body() loginUserDto: LoginUserDto) {
-    return this.authService.loginUser(loginUserDto);
+  async login(@Body() loginUserDto: LoginUserDto, @Res({passthrough : true}) response : Response, @Cookies(TOKEN_NAME) cookies : any) {
+    const token =  await this.authService.loginUser(loginUserDto);
+    console.log("Token generated:", token);
+    response.cookie(TOKEN_NAME, token, { httpOnly : false, secure : true, sameSite : 'none' , maxAge: 1000 * 60 * 60 * 24 * 7});
   }
 
   @ApiOperation({ 
