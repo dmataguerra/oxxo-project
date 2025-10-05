@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
     let token = this.extractTokenFromHeader(request);
     if (!token) {
       token = request.cookies?.[TOKEN_NAME];
-      throw new UnauthorizedException();
+      if (!token) throw new UnauthorizedException();
     }
     try {
       const payload = await this.jwtService.verifyAsync(
@@ -25,8 +25,7 @@ export class AuthGuard implements CanActivate {
           secret: JWT_KEY
         }
       );
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
+
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException();
