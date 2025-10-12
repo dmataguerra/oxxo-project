@@ -38,14 +38,14 @@ export class Location {
     locationLating: number[];
 
     @ApiProperty({
-        description: 'Manager assigned to this location',
-        type: () => Manager
+        default: "1b1434ad-1b2c-4e3d-8f4a-2c3d5e6f7g8h"})
+    @OneToOne(() => Manager, {
+    eager : true,
     })
-    @OneToOne(() => Manager, {eager : true})
     @JoinColumn({
         name : "managerId"
     })
-    manager : Manager;
+    manager : Manager | string;
 
     @ApiProperty({
         description: 'Region this location belongs to',

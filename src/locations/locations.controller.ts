@@ -8,7 +8,7 @@ import { ApiResponse, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { ApiAuth } from 'src/auth/decorators/api.decorators';
 
 @ApiTags('Locations')
-@ApiAuth()
+//@ApiAuth()
 @Controller('locations')
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
@@ -39,7 +39,7 @@ export class LocationsController {
     status: 200, 
     description: 'List of locations retrieved successfully' 
   })
-  @Auth(ROLES.ADMIN, ROLES.MANAGER, ROLES.EMPLOYEE)
+ // @Auth(ROLES.ADMIN, ROLES.MANAGER, ROLES.EMPLOYEE)
   @Get()
   findAll() {
     return this.locationsService.findAll();

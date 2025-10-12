@@ -7,7 +7,20 @@ import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
 
-  const app = await NestFactory.create(AppModule, { cors: {origin: process.env.allowedOrigin, credentials : true} });
+  const app = await NestFactory.create(AppModule, { 
+    cors: {
+      origin: process.env.allowedOrigin?.split(',') || [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:5173'
+      ],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+      exposedHeaders: ['Set-Cookie']
+    }
+  });
   app.use(cookieParser());
   const config = new DocumentBuilder()
     .setTitle('OXXO API')
