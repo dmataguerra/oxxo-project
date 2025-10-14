@@ -5,12 +5,15 @@ import { Repository } from 'typeorm';
 import { Location } from './entities/location.entity';
 import { NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Manager } from '../managers/entities/manager.entity';
 
 @Injectable()
 export class LocationsService {
   constructor(
     @InjectRepository(Location)
-    private locationRepository: Repository<Location>
+    private locationRepository: Repository<Location>,
+    @InjectRepository(Manager)
+    private managerRepository: Repository<Manager>
   ){}
   async create(createLocationDto: CreateLocationDto) {
     const location = this.locationRepository.create({

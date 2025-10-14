@@ -46,6 +46,9 @@ export class Manager {
         type: () => Location
     })
     @OneToOne(() => Location)
+    @JoinColumn({
+        name: "locationId"
+    })
     location : Location;
 
     @ApiProperty({
