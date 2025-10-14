@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, ManyToOne, OneToMany} from 'typeorm';
-import {Manager} from "../../managers/entities/manager.entity";
-import {Region} from "../../regions/entities/region.entity";
-import {Employee} from "../../employees/entities/employee.entity";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Manager } from "../../managers/entities/manager.entity";
+import { Region } from "../../regions/entities/region.entity";
+import { Employee } from "../../employees/entities/employee.entity";
 
 @Entity()
 export class Location {
@@ -38,26 +38,27 @@ export class Location {
     locationLating: number[];
 
     @ApiProperty({
-        default: "1b1434ad-1b2c-4e3d-8f4a-2c3d5e6f7g8h"})
+        default: "1b1434ad-1b2c-4e3d-8f4a-2c3d5e6f7g8h"
+    })
     @OneToOne(() => Manager, {
-    eager : true,
+        eager: true,
     })
     @JoinColumn({
-        name : "managerId"
+        name: "managerId"
     })
-    manager : Manager | string;
+    manager: Manager | string;
 
     @ApiProperty({
         description: 'Region this location belongs to',
         type: () => Region
     })
-    @ManyToOne(() => Region, (region) => region.locations,{
-        eager : true
+    @ManyToOne(() => Region, (region) => region.locations, {
+        eager: true
     })
     @JoinColumn({
-        name : "regionId"
+        name: "regionId"
     })
-    region : Region;
+    region: Region;
 
     @ApiProperty({
         description: 'List of employees working at this location',
@@ -65,5 +66,5 @@ export class Location {
         isArray: true
     })
     @OneToMany(() => Employee, (employee) => employee.location)
-    employees : Employee[];
+    employees: Employee[];
 }
