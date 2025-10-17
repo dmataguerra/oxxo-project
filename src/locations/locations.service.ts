@@ -25,17 +25,22 @@ export class LocationsService {
   }
 
   findAll() {
-    return this.locationRepository.find();
+    return this.locationRepository.find({
+      relations: ['manager', 'region', 'employees']
+    });
   }
 
 
-  findOne(id: number) {
-    const location = this.locationRepository.findOneBy({ 
-      locationId: id 
+  async findOne(id: number) {
+    const location = await this.locationRepository.findOne({ 
+      where: { locationId: id },
+      relations: ['manager', 'region', 'employees']
     });
-    if(!location) {
-        throw new NotFoundException('Location not found');
-    } 
+    
+    if (!location) {
+      throw new NotFoundException('Location not found');
+    }
+    
     return location;
   }
 
