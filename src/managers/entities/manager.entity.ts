@@ -49,7 +49,7 @@ export class Manager {
     @JoinColumn({
         name: "locationId"
     })
-    location : Location;
+    location : Location | string;
 
     @ApiProperty({
         description: 'User account associated with this manager',

@@ -39,7 +39,18 @@ export class CreateManagerDto {
         description: 'User UUID associated with this manager',
         example: '123e4567-e89b-12d3-a456-426614174000'
     })
+
     @IsUUID()
     @IsOptional()
     userId?: string;
+
+    @ApiPropertyOptional({
+        description: 'ID of the location to assign to this manager',
+        example: 1,
+        type: 'number'
+    })
+
+    @IsNumber()
+    @IsOptional()
+    locationId?: number;
 }
