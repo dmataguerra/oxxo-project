@@ -10,18 +10,21 @@ export class AwsService {
             secretAccessKey: process.env.secretkey_bucket!,
         }
     })
-    
-    async uploadFile(file : Express.Multer.File){
-        const key = file.originalname;
-        const bucket = 'oxxo-project';
-        const command = new PutObjectCommand({
-            Key : key,
-            Body : file.buffer,
-            Bucket : bucket,
 
-        })  
-        const response = await this.s3.send(command);
-        console.log(response);
-        return response;
+    async uploadFile(file: Express.Multer.File) {
+        try {
+            const key = file.originalname;
+            const bucket = 'oxxo-project';
+            const command = new PutObjectCommand({
+                Key: key,
+                Body: file.buffer,
+                Bucket: bucket,
+
+            })
+            return await this.s3.send(command);
+        } catch (error) {
+            console.error('Error uploading file to S3:', error);
+            throw error;
+        }
     }
 }
