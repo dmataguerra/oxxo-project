@@ -19,13 +19,18 @@ export class ProvidersService {
   }
 
   findAll() {
-    return this.providerRepository.find();
+    return this.providerRepository.find({relations : { products: true }});
   }
 
   findOne(id: string) {
-    return this.providerRepository.findOneBy({
-      providerId: id
-    })
+    return this.providerRepository.findOne({
+      where: {
+        providerId: id
+      },
+      relations: {
+        products: true
+      }
+    });
   }
   
   async update(id: string, updateProviderDto: UpdateProviderDto) {
