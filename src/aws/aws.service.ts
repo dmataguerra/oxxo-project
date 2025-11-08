@@ -14,6 +14,7 @@ export class AwsService {
     async uploadFile(file: Express.Multer.File) {
         try {
             const key = file.originalname;
+            const url = "https://oxxo-project.s3.us-east-2.amazonaws.com/" + key;
             const bucket = 'oxxo-project';
             const command = new PutObjectCommand({
                 Key: key,
@@ -21,7 +22,8 @@ export class AwsService {
                 Bucket: bucket,
 
             })
-            return await this.s3.send(command);
+            await this.s3.send(command);
+            return { url };
         } catch (error) {
             console.error('Error uploading file to S3:', error);
             throw error;

@@ -145,11 +145,12 @@ export class EmployeesController {
     example: 'OK'
   })
   @Auth(ROLES.EMPLOYEE, ROLES.ADMIN, ROLES.MANAGER)
-  @Post('upload')
+  @Post(':id/upload')
   @UseInterceptors(FileInterceptor('file', { dest: './src/employees/employees-photos' }))
-  uploadPhoto(@UploadedFile() file: Express.Multer.File) {
+  async uploadPhoto(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
     console.log(file);
-    return this.awsService.uploadFile(file);
+    const response = await this.awsService.uploadFile(file);
+    return this.employeesService.update(id, {employeePhoto : response.url})
   }
 
   @ApiOperation({
