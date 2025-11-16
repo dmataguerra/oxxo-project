@@ -13,7 +13,12 @@ import { Manager } from 'src/managers/entities/manager.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) private userRepository: Repository<User>, @InjectRepository(User) private employeeRepository: Repository<Employee>, @InjectRepository(User) private managerRepository: Repository<Manager>, private jwtService: JwtService,) { }
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Employee) private employeeRepository: Repository<Employee>,
+    @InjectRepository(Manager) private managerRepository: Repository<Manager>,
+    private jwtService: JwtService,
+  ) { }
 
   async registerEmployee(id: string, createUserDto: CreateUserDto) {
     const roles = createUserDto.userRoles

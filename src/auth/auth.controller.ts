@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Res, Query, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,9 +6,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { ApiResponse, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { ApiAuth } from 'src/auth/decorators/api.decorators';
 import type { Response } from 'express';
-import {TOKEN_NAME} from './constants/jwt.constants';
-import {Cookies} from './decorators/cookies.decorators';
-import {Param as Query} from '@nestjs/common';
+import { TOKEN_NAME } from './constants/jwt.constants';
 
 @ApiTags('Authentication')
 @ApiAuth()
@@ -29,21 +27,24 @@ export class AuthController {
     status: 400, 
     description: 'Bad request - Invalid input data' 
   })
-
+  
   @Post('register/:id')
-  registerManager(@Query("role") role : string, @Body() createUserDto: CreateUserDto, @Param('id') id: string) {
-
-    if (role === "manager") {
-      return this,this.authService.registerManager(id, createUserDto);
-    } else if (role === "employee") {
-      return this.authService.registerEmployee(id, createUserDto);
+  registerViaParam(
+    @Param('id') id: string,
+    @Query('role') role: string,
+    @Body() createUserDto: CreateUserDto,
+  ) {
+    const r = (role || '').toLowerCase();
+    if (r !== 'employee' && r !== 'manager') {
+      throw new BadRequestException("Invalid role. Use 'employee' or 'manager'.");
     }
-
-    if (createUserDto.userRoles.includes('Admin') || createUserDto.userRoles.includes('Employee')) {
-      throw new Error('Rol invalido');
-    }
+    createUserDto.userRoles = [r === 'employee' ? 'Employee' : 'Manager'];
+    return r === 'employee'
+      ? this.authService.registerEmployee(id, createUserDto)
+      : this.authService.registerManager(id, createUserDto);
   }
 
+  // Keep a single, clean register endpoint using path param and role query
   @ApiOperation({ 
     summary: 'User login',
     description: 'Authenticate user with email and password, returns JWT token'
@@ -64,10 +65,15 @@ export class AuthController {
 
 
   @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto, @Res({passthrough : true}) response : Response, @Cookies(TOKEN_NAME) cookies : any) {
-    const token =  await this.authService.loginUser(loginUserDto);
-    console.log("Token generated:", token);
-    response.cookie(TOKEN_NAME, token, { httpOnly : false, secure : true, sameSite : 'none' , maxAge: 1000 * 60 * 60 * 24 * 7});
+  async login(@Body() loginUserDto: LoginUserDto, @Res({ passthrough: true }) response: Response) {
+    const { token } = await this.authService.loginUser(loginUserDto);
+    response.cookie(TOKEN_NAME, token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+    return { access_token: token };
   }
 
   @ApiOperation({ 
