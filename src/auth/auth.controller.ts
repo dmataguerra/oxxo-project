@@ -8,6 +8,7 @@ import { ApiAuth } from 'src/auth/decorators/api.decorators';
 import type { Response } from 'express';
 import {TOKEN_NAME} from './constants/jwt.constants';
 import {Cookies} from './decorators/cookies.decorators';
+import {Param as Query} from '@nestjs/common';
 
 @ApiTags('Authentication')
 @ApiAuth()
@@ -28,20 +29,19 @@ export class AuthController {
     status: 400, 
     description: 'Bad request - Invalid input data' 
   })
-  @Post('register/employee/:id')
-  registerEmployee(@Body() createUserDto: CreateUserDto, @Param('id') id: string) {
-    if (createUserDto.userRoles.includes('Admin') || createUserDto.userRoles.includes('Manager')) {
-      throw new Error('Rol invalido');
-    }
-    return this.authService.registerEmployee(id, createUserDto);
-  }
 
-  @Post('register/manager/:id')
-  registerManager(@Body() createUserDto: CreateUserDto, @Param('id') id: string) {
+  @Post('register/:id')
+  registerManager(@Query("role") role : string, @Body() createUserDto: CreateUserDto, @Param('id') id: string) {
+
+    if (role === "manager") {
+      return this,this.authService.registerManager(id, createUserDto);
+    } else if (role === "employee") {
+      return this.authService.registerEmployee(id, createUserDto);
+    }
+
     if (createUserDto.userRoles.includes('Admin') || createUserDto.userRoles.includes('Employee')) {
       throw new Error('Rol invalido');
     }
-    return this.authService.registerManager(id, createUserDto);
   }
 
   @ApiOperation({ 

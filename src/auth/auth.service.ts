@@ -16,6 +16,10 @@ export class AuthService {
   constructor(@InjectRepository(User) private userRepository: Repository<User>, @InjectRepository(User) private employeeRepository: Repository<Employee>, @InjectRepository(User) private managerRepository: Repository<Manager>, private jwtService: JwtService,) { }
 
   async registerEmployee(id: string, createUserDto: CreateUserDto) {
+    const roles = createUserDto.userRoles
+    if(roles.includes('Admin') || roles.includes('Manager')) {
+      throw new Error('Rol invalido para empleado');
+    }
     createUserDto.userPassword = bcrypt.hashSync(createUserDto.userPassword, 5);
     const user = await this.userRepository.save(createUserDto);
     const employeeToUpdate = await this.employeeRepository.preload({
@@ -29,6 +33,10 @@ export class AuthService {
   }
 
   async registerManager(id: string, createUserDto: CreateUserDto) {
+    const roles = createUserDto.userRoles
+    if(roles.includes('Admin') || roles.includes('Employee')) {
+      throw new Error('Rol invalido para manager');
+    }
     createUserDto.userPassword = bcrypt.hashSync(createUserDto.userPassword, 5);
     const user = await this.userRepository.save(createUserDto);
     const managerToUpdate = await this.managerRepository.preload({
