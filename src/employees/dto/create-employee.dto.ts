@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsEmail, IsNumber, IsObject, IsString, MaxLength, IsOptional, IsUUID } from "class-validator";
+import { Transform, Type } from "class-transformer";
+import { IsEmail, IsNumber, IsObject, IsString, MaxLength, IsOptional } from "class-validator";
 
 export class LocationEmployeeDto {
     @ApiProperty({
@@ -75,7 +76,26 @@ export class CreateEmployeeDto{
         type: LocationEmployeeDto
     })
     @IsOptional()
+    @Transform(({ value }) => {
+        if (typeof value === 'string') {
+            try {
+                return JSON.parse(value);
+            } catch {
+                return value;
+            }
+        }
+        return value;
+    })
     @IsObject()
-    location : LocationEmployeeDto;
+    @Type(() => LocationEmployeeDto)
+    location: LocationEmployeeDto;
+
+    @ApiPropertyOptional({
+        description: 'Photo URL of the employee',
+        example: 'https://s3.amazonaws.com/bucket/photo.jpg',
+    })
+    @IsOptional()
+    @IsString()
+    employeePhoto?: string;
 }
 

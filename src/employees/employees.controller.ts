@@ -47,7 +47,13 @@ export class EmployeesController {
   })
   @Auth(ROLES.ADMIN, ROLES.MANAGER)
   @Post()
-  create(@Body() createEmployeeDto: CreateEmployeeDto) {
+  @UseInterceptors(FileInterceptor("employeePhoto"))
+  async create(@Body() createEmployeeDto: CreateEmployeeDto, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      return this.employeesService.create(createEmployeeDto);
+    }
+    const uploaded = await this.awsService.uploadFile(file);
+    createEmployeeDto.employeePhoto = (typeof uploaded === 'string') ? uploaded : uploaded.url;
     return this.employeesService.create(createEmployeeDto);
   }
 
@@ -128,10 +134,19 @@ export class EmployeesController {
     status: 404,
     description: 'Employee not found'
   })
+
   @Auth(ROLES.ADMIN, ROLES.MANAGER, ROLES.EMPLOYEE)
+  @UseInterceptors(FileInterceptor("employeePhoto"))
   @Patch(':id')
-  update(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
-    return this.employeesService.update(id, updateEmployeeDto);
+  async update(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string, @Body() updateEmployeeDto: UpdateEmployeeDto, @UploadedFile() file: Express.Multer.File) {
+    if (file.originalname == "undefined") {
+      return this.employeesService.update(id, updateEmployeeDto);
+    } else {
+      const fileUrl = await this.awsService.uploadFile(file);
+      updateEmployeeDto.employeePhoto = fileUrl.url;
+      return this.employeesService.update(id, updateEmployeeDto);
+    }
+
   }
 
   @ApiOperation({
@@ -150,7 +165,7 @@ export class EmployeesController {
   async uploadPhoto(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
     console.log(file);
     const response = await this.awsService.uploadFile(file);
-    return this.employeesService.update(id, {employeePhoto : response.url})
+    return this.employeesService.update(id, { employeePhoto: response.url })
   }
 
   @ApiOperation({
