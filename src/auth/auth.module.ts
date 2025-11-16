@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { UsersController } from 'src/users/users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import  {User} from './entities/user.entity';
 import {JwtModule} from '@nestjs/jwt';
@@ -18,7 +19,7 @@ import { Manager } from 'src/managers/entities/manager.entity';
     global: true
   })
 ],
-  controllers: [AuthController],
+  controllers: [AuthController, UsersController],
   providers: [AuthService],
 })
 export class AuthModule {}

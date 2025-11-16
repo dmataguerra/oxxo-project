@@ -97,4 +97,10 @@ export class AuthController {
   updateUser(@Param('email') userEmail: string, @Body()  updateUserDto:UpdateUserDto){
     return this.authService.updateUser(userEmail, updateUserDto);
   }
+
+  // Update user by ID (recommended for frontend)
+  @Patch('users/:id')
+  updateUserById(@Param('id') userId: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.authService.updateUserById(userId, updateUserDto);
+  }
 }
