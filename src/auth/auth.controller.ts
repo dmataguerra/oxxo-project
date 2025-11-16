@@ -28,9 +28,20 @@ export class AuthController {
     status: 400, 
     description: 'Bad request - Invalid input data' 
   })
-  @Post('signup')
-  signup(@Body () createUserDto : CreateUserDto) {
-    return this.authService.registerUser(createUserDto);
+  @Post('register/employee/:id')
+  registerEmployee(@Body() createUserDto: CreateUserDto, @Param('id') id: string) {
+    if (createUserDto.userRoles.includes('Admin') || createUserDto.userRoles.includes('Manager')) {
+      throw new Error('Rol invalido');
+    }
+    return this.authService.registerEmployee(id, createUserDto);
+  }
+
+  @Post('register/manager/:id')
+  registerManager(@Body() createUserDto: CreateUserDto, @Param('id') id: string) {
+    if (createUserDto.userRoles.includes('Admin') || createUserDto.userRoles.includes('Employee')) {
+      throw new Error('Rol invalido');
+    }
+    return this.authService.registerManager(id, createUserDto);
   }
 
   @ApiOperation({ 
@@ -49,6 +60,9 @@ export class AuthController {
     status: 401, 
     description: 'Unauthorized - Invalid credentials' 
   })
+
+
+
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto, @Res({passthrough : true}) response : Response, @Cookies(TOKEN_NAME) cookies : any) {
     const token =  await this.authService.loginUser(loginUserDto);

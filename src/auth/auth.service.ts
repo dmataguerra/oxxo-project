@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto} from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -8,36 +8,60 @@ import bcrypt from 'bcrypt';
 import { NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
+import { Employee } from 'src/employees/entities/employee.entity';
+import { Manager } from 'src/managers/entities/manager.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) private userRepository : Repository<User>, private jwtService : JwtService,) {}
-  registerUser(createUserDto : CreateUserDto) {
+  constructor(@InjectRepository(User) private userRepository: Repository<User>, @InjectRepository(User) private employeeRepository: Repository<Employee>, @InjectRepository(User) private managerRepository: Repository<Manager>, private jwtService: JwtService,) { }
+
+  async registerEmployee(id: string, createUserDto: CreateUserDto) {
     createUserDto.userPassword = bcrypt.hashSync(createUserDto.userPassword, 5);
-    return this.userRepository.save(createUserDto);
+    const user = await this.userRepository.save(createUserDto);
+    const employeeToUpdate = await this.employeeRepository.preload({
+      id: id,
+    });
+    if (!employeeToUpdate) {
+      throw new NotFoundException('Employee not found');
+    }
+    employeeToUpdate.user = user;
+    return this.employeeRepository.save(employeeToUpdate);
   }
-  
+
+  async registerManager(id: string, createUserDto: CreateUserDto) {
+    createUserDto.userPassword = bcrypt.hashSync(createUserDto.userPassword, 5);
+    const user = await this.userRepository.save(createUserDto);
+    const managerToUpdate = await this.managerRepository.preload({
+      managerId: id,
+    });
+    if (!managerToUpdate) {
+      throw new NotFoundException('Manager not found');
+    }
+    managerToUpdate.user = user;
+    return this.managerRepository.save(managerToUpdate);
+  }
+
   async loginUser(loginUserDto: LoginUserDto) {
     const user = await this.userRepository.findOne({
-      where : {
-        userEmail : loginUserDto.userEmail
+      where: {
+        userEmail: loginUserDto.userEmail
       }
-    }); 
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
     const match = bcrypt.compareSync(loginUserDto.userPassword, user.userPassword);
-    
-    if(!match) {
-      return { message : "Invalid credentials" }
+
+    if (!match) {
+      return { message: "Invalid credentials" }
     }
 
-    const token = this.jwtService.sign({ 
-      userId: user.userId, 
-      userEmail: user.userEmail, 
-      userRoles: user.userRoles 
+    const token = this.jwtService.sign({
+      userId: user.userId,
+      userEmail: user.userEmail,
+      userRoles: user.userRoles
     });
-    return { token }; 
+    return { token };
     //return { message : "Login successful" }
   }
 
@@ -50,11 +74,11 @@ export class AuthService {
       userEmail,
       ...updateUserDto
     });
-    
+
     if (!newUserData) {
       throw new NotFoundException('User not found');
     }
-    
+
     return await this.userRepository.save(newUserData);
   }
 }
